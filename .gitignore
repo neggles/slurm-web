@@ -1,4 +1,4 @@
-__pycache__/
+**/__pycache__/
 *.egg-info/
 .ninja_log
 build/
@@ -8,3 +8,4 @@ generated-doc
 node_modules
 /frontend/dist
 /docs/man/*.1
+data/
