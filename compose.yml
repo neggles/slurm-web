@@ -1,0 +1,53 @@
+name: slurm-web
+services:
+  gateway:
+    image: slurm-web:latest
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: slurm-web-gateway
+    environment:
+      SLURM_WEB_MODE: gateway
+      SLURM_WEB_CONF: /etc/slurm-web/gateway.ini
+    ports:
+      - target: 5011
+        published: 5011
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: ./data/gateway.ini
+        target: /etc/slurm-web/gateway.ini
+        read_only: true
+      # uncomment or add with compose.override.yml for socket access to slurmrestd
+      # - type: bind
+      #   source: /run/slurmrestd/slurmrestd.socket
+      #   target: /run/slurmrestd/slurmrestd.socket
+
+  agent:
+    image: slurm-web:latest
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: slurm-web-agent
+    environment:
+      SLURM_WEB_MODE: agent
+      SLURM_WEB_CONF: /etc/slurm-web/agent.ini
+    ports:
+      - target: 5012
+        published: 5012
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: ./data/agent.ini
+        target: /etc/slurm-web/agent.ini
+        read_only: true
+      - type: bind
+        source: ${SLURM_WEB_JWT_KEY_PATH:-./data/jwt_hs256.key}
+        target: /var/lib/slurm-web/slurmrestd.key
+        read_only: true
+      # uncomment or add with compose.override.yml for socket access to slurmrestd
+      # - type: bind
+      #   source: /run/slurmrestd/slurmrestd.socket
+      #   target: /run/slurmrestd/slurmrestd.socket
